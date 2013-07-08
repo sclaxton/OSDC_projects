@@ -1,0 +1,120 @@
+<!DOCTYPE html> 
+<meta charset="utf-8">
+<style>
+
+.chart rect {                                                                 
+    stroke: steelblue;
+    stroke-opacity: 0;
+    fill: steelblue;
+    fill-opacity: .5;
+}
+
+body {
+  font: 5px Helvetica Neue;
+  text-rendering: optimizeLegibility;
+  margin-top: 1em;
+  overflow-y: scroll;
+}
+
+</style> 
+<body> 
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js"></script>
+<script>
+    $( document ).ready(function () {                                               
+        console.log( "document loaded" )
+        var JSON
+        (function () {
+            var callback = function () {
+                JSON = (function () {
+                    var json = null
+                    $.ajax({
+                        'async': false,
+                        'global': false,
+                        'url': 'json.txt',
+                        'dataType': "json",
+                        'success': function (data) {
+                            json = data
+                        }
+                    })
+                    return json
+                })()
+            }
+            callback()
+            setInterval(callback, 30000) 
+        })()
+        console.log($.extend(true, JSON["status_data"], JSON["update_times"]))
+        var menu_data = [] 
+        $.each(JSON["status_data"], function(k, v){
+            menu_data.push(v)
+        })
+        var time_strs
+        (function () {
+            var callback = function () {
+                time_strs = []
+                $.each(JSON["update_times"], function(k, v){
+                    time_strs.push(v)
+                })
+                    }
+            callback()
+            setInterval(callback, 30000)
+        })()
+        var menu_strs = Object.keys(JSON["status_data"])  // strings for txt of initial menu 
+        var JSON_len = menu_strs.length
+
+        var chart = d3.select("body")
+            .append("svg:svg")                      
+            .attr("class", "chart")
+            .attr("width", 30 * JSON_len )
+            .attr("height", 30 * JSON_len )
+              
+        // wraps each text block in string array in styled svg
+        // rect and aligns into menu block within container 
+        function menuify(menu_strs, x, y, txt_class, bar_class, container) {
+            
+            var pos = x  // accumulator for horizontal positioning 
+            
+            container.selectAll("rect")
+                .data(menu_strs)
+                .enter().append("rect")
+                .attr("class", bar_class )
+                .attr("y", y)
+            
+            container.selectAll("text")
+                .data(menu_strs)
+                .enter().append("text")
+                .attr("class", txt_class )
+                .text(String)
+            
+            $( "." + txt_class ).each( function (i, el) {
+                var bbox = el.getBBox()
+                var width = bbox.width  
+                var height = bbox.height
+                $(el).attr("x", pos )
+                    .attr("y", y + .75 * height ) 
+                $("." + bar_class ).eq(i)
+                    .attr("width", width )
+                    .attr("height", height )
+                    .attr("x", pos )
+                
+                    pos += width
+                    
+            })
+                }
+        
+            menuify(time_strs, 0, 0, "labels", "menubars", chart); 
+       
+
+        $(".menubars").on("mouseover", function (event) {
+            d3.selectAll(".menubars").data(Object.values)
+
+
+        })
+
+        
+    })
+ 
+
+</script> 
+
