@@ -44,23 +44,7 @@ body {
             callback()
             setInterval(callback, 30000) 
         })()
-        console.log($.extend(true, JSON["status_data"], JSON["update_times"]))
-        var menu_data = [] 
-        $.each(JSON["status_data"], function(k, v){
-            menu_data.push(v)
-        })
-        var time_strs
-        (function () {
-            var callback = function () {
-                time_strs = []
-                $.each(JSON["update_times"], function(k, v){
-                    time_strs.push(v)
-                })
-                    }
-            callback()
-            setInterval(callback, 30000)
-        })()
-        var menu_strs = Object.keys(JSON["status_data"])  // strings for txt of initial menu 
+        var menu_strs = Object.keys(JSON)  // strings for txt of initial menu 
         var JSON_len = menu_strs.length
 
         var chart = d3.select("body")
@@ -107,7 +91,9 @@ body {
        
 
         $(".menubars").on("mouseover", function (event) {
-            d3.selectAll(".menubars").data(Object.values)
+            d3.selectAll(".menubars").data(Object.values(JSON))
+            var el = event.target 
+            var 
 
 
         })
