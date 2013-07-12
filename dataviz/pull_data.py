@@ -1,16 +1,15 @@
-from django.template.defaultfilters import slugify
 import urllib2, json, threading
 
-def get_percent(used, total):
-    if float(total) == 0:
-        return 0
-    else:
-        return float(used)/float(total)
-
-def append_status(data, cloud_status_data, currcloud, label, idprefix, value_name):
+unit_tags = [ 'cluster', 'ram', 'ldisk', 'disk', 'hdfsdu' ] 
+            
+def append_status(data, cloud_status_data, currcloud, label, value_name):
     max_val =  data[currcloud][value_name]['max']
     val =  data[currcloud][value_name]['val']
-    cloud_status_data.update( { label : dict( tag=idprefix+'-'+value_name, value=val, max_val=max_val, percent=get_percent(val, max_val) ) } )
+    unit = ""
+    if value_name in unit_tags: 
+        unit = "GB"
+
+    cloud_status_data.update( { label : dict( unit=unit, value=val, max_val=max_val,) } )
 
     ''' Requires settings.STATUS_URL and settings.STATUS where settings.STATUS
     is a list of tuples consisting of a display name and a dictionary with three
@@ -82,15 +81,15 @@ def update_status():
         
     status_attrs = {
         "cloud": [
-            ('Storage Used (GB)', 'cluster'),
+            ('Storage Used', 'cluster'),
             ('Active Users', 'users'), ('VM Instances', 'vms'),
-            ('VM Cores', 'cores'), ('VM RAM (GB)', 'ram'),
-            ('VM Instance Storage (GB)', 'ldisk')],
+            ('VM Cores', 'cores'), ('VM RAM', 'ram'),
+            ('VM Instance Storage', 'ldisk')],
         "map_reduce": [
-            ('HDFS Storage (GB)', 'hdfsdu'),
+            ('HDFS Storage', 'hdfsdu'),
             ('Active Jobs', 'jobs'), ('Active Users', 'users')],
         "storage" : [
-            ('Storage Used (GB)', 'disk')]
+            ('Storage Used', 'disk')]
     }
     
     for cloud_name, cloud in STATUS:
@@ -102,7 +101,7 @@ def update_status():
             
             for attr_name, attr_id in status_attrs[cloud["type"]]:
                 append_status(data, status_data[cloud_name],
-                              cloud["dashboard"], attr_name, slugify(cloud_name), attr_id)
+                              cloud["dashboard"], attr_name, attr_id)
                 
             update_times[cloud_name] = data[cloud["dashboard"]]['users']['stsh']
         else:
