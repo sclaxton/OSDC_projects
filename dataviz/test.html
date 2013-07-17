@@ -4,12 +4,22 @@
   
 .chart rect {                                                                 
     stroke-opacity: 0;
-    fill-opacity: 0.5;
+    fill-opacity: .75;
+    fill: steelblue;
 }
 
+.menu_container text { 
+    fill: white; 
+}
 
 .menu_container rect {
-    fill-opacity: 0; 
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: steelblue;
+    stroke-width: .5; 
+    stroke-linecap: round; 
+    stroke-linejoin: round;   
+
 }
 
 body {
@@ -24,8 +34,8 @@ body {
     stroke: gray;
     font-face: sans-serif;
     font-size 10px; 
-    height: 300px;
-    width: 450px;
+    height: 100px;
+    width: 100px;
 }
 #piechart .total{
     font-size: 18px;
@@ -81,25 +91,26 @@ $j( document ).ready(function () {
     var menu_strs = Object.keys(JSON)  // strings for txt of initial menu 
     
     var chart = d3.select("body")
-        .append("svg:svg")                      
+        .append("svg")                      
         .attr("class", "chart")
     
 
 //////////////////////////////////////////////////////////////////////////////////
-//// MENU CONSTRUCTOR ////////////////////////////////////////////////////////////
+//// MENU CONSTRUCTION ///////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
-    var cush = 1.10
+    var cush = 2
     var menu_x = 0
     var menu_y = 0 
     
-    var menu_back = container.append("rect")
-        .attr("class", menu_back_class)
+    var menu_back = chart.append("rect")
+        .attr("class", "menu_back")
         .attr("x", menu_x) 
         .attr("y", menu_y)
+        .attr("rx", 2)
     
-    var menu_container = container.append("svg:svg")
-        .attr("class", menu_container_class) 
+    var menu_container = chart.append("svg")
+        .attr("class", "menu_container") 
         .attr("x", menu_x)
         .attr("y", menu_y)
             
@@ -113,7 +124,7 @@ $j( document ).ready(function () {
         .data(JSON_vals)
         .enter().append("rect")
         .attr("class", "menu_bars" )
-
+        .attr("rx", 2)
 
     // align text and bars horizontally
     // bool is passed to signal if the 
@@ -140,10 +151,11 @@ $j( document ).ready(function () {
         
         txt_selection.each( function (i, el) {
             var bbox = el.getBBox()
-            var width = cush * bbox.width  
-            var height = cush * bbox.height
-            $j(el).attr("x", pos )
-                .attr("y", y_0 + .75 * height ) 
+            var width = cush + bbox.width  
+            var height = cush + bbox.height
+            $j(el).attr("x", pos + width/2 )
+                .attr("y", y_0 + .75 * height )
+                .attr("text-anchor", "middle") 
             $j("." + bar_class ).eq(i)
                 .attr("width", width )
                 .attr("height", height )
@@ -176,6 +188,7 @@ $j( document ).ready(function () {
     var time_updated 
     var dropdown_bars 
     var dropdown_txt 
+    var scale_factor
 
     // event handler for dropdown menus 
     $j(".menu_bars").on('mouseenter', function (event) {
@@ -217,14 +230,16 @@ $j( document ).ready(function () {
         current_text = $(".dropdown_container .update")
 
         var curr_width
+        var len 
 
         current_text.each( function (i, el) {
             var width = el.getBBox().width
             curr_width += width
+            len += 1
         });
 
-        var scale_width = .75 * (menu_width / cush)
-        var scale_factor = scale_width / curr_width 
+        var scale_width = .75 * (menu_width - cush * len)
+        scale_factor = scale_width / curr_width 
 
         current_text.attr("transform", scale(scale_factor) )
 
@@ -243,16 +258,15 @@ $j( document ).ready(function () {
 
     })
 
+
         
     ///////////////////////////////////////////////////////////////////////////////
     //// PIECHART CODE MODIFIED FROM D3 TUTORIAL //////////////////////////////////
     //// BY STEPHEN BOAK //////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////
     
-    var w = 450;
-    var h = 300;
-    var r = 100;
-    var ir = 45;
+    var r = 20;
+    var ir = 5;
     var textOffset = 14;
     var tweenDuration = 250;
     
@@ -276,30 +290,32 @@ $j( document ).ready(function () {
 
     var vis = chart.append("svg:svg")
         .attr("id", "piechart")
-        .attr("x", )
-        .attr("y", )  
-   
+        .attr("x", menu_x)
+        .attr("y", menu_y + menu_height)   
+        .attr("width", 100)
+        .attr("height", 100)
+       
+    //GROUP FOR ARCS/PATHS
+    var arc_group = vis.append("svg:g")
+        .attr("class", "arc")
+        .attr("transform", "translate(" + (w/2) + "," + (h/2) + ")");
+
     //PLACEHOLDER GRAY CIRCLE
     var paths = arc_group.append("svg:circle")
         .attr("fill", "#EFEFEF")
         .attr("r", r);
-
+    
     //HANDLER FOR GRAY CIRCLE
     $j(":not(.dropdown_container *):not(#piechart):not(#piechart *)")
         .on("mouseenter", function (event) {
-
+            
             arc_group.selectAll("circle").remove();
             arc_group.append("svg:circle")
                 .attr("fill", "#EFEFEF")
                 .attr("r", r);
 
         })
-
-    //GROUP FOR ARCS/PATHS
-    var arc_group = vis.append("svg:g")
-        .attr("class", "arc")
-        .attr("transform", "translate(" + (w/2) + "," + (h/2) + ")");
-
+    
     //GROUP FOR LABELS
     var label_group = vis.append("svg:g")
         .attr("class", "label_group")
@@ -320,29 +336,31 @@ $j( document ).ready(function () {
         .attr("r", ir);
 
     // "TOTAL" LABEL
-    var totalLabel = center_group.append("svg:text")
-        .attr("class", "label")
-        .attr("dy", -15)
-        .attr("text-anchor", "middle") // text-align: right
-        .text("TOTAL");
+    // var totalLabel = center_group.append("svg:text")
+    //     .attr("class", "label")
+    //     .attr("dy", -15)
+    //     .attr("text-anchor", "middle") // text-align: right
+    //     .text("TOTAL");
 
-    //TOTAL TRAFFIC VALUE
-    var totalValue = center_group.append("svg:text")
-        .attr("class", "total")
-        .attr("dy", 7)
-        .attr("text-anchor", "middle") // text-align: right
-        .text("Waiting...");
+    // //TOTAL TRAFFIC VALUE
+    // var totalValue = center_group.append("svg:text")
+    //     .attr("class", "total")
+    //     .attr("dy", 7)
+    //     .attr("text-anchor", "middle") // text-align: right
+    //     .text("Waiting...");
 
-    //UNITS LABEL
-    var totalUnits = center_group.append("svg:text")
-        .attr("class", "units")
-        .attr("dy", 21)
-        .attr("text-anchor", "middle") // text-align: right
+    // //UNITS LABEL
+    // var totalUnits = center_group.append("svg:text")
+    //     .attr("class", "units")
+    //     .attr("dy", 21)
+    //     .attr("text-anchor", "middle") // text-align: right
 
 
     ///////////////////////////////////////////////////////////
     // MOUSEENTER HANDLER  /////////////////////////////////////
     ///////////////////////////////////////////////////////////
+
+$j(".update").on("mouseenter", update) 
 
     // event handler for when status attribute is moused over 
     function update(event) {
