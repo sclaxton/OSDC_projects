@@ -1,0 +1,10 @@
+#expand{white-space:nowrap;padding-right:0; unicode-bidi:-moz-isolate;unicode-bidi:-webkit-isolate;unicode-bidi:isolate}
+.expand-bracket{-webkit-transition:color 100ms ease-out,margin 100ms ease-out;-moz-transition:color 100ms ease-out,margin 100ms ease-out;-ms-transition:color 100ms ease-out,margin 100ms ease-out;-o-transition:color 100ms ease-out,margin 100ms ease-out;transition:color 100ms ease-out,margin 100ms ease-out} 
+#expand_heading{font-weight:normal;}
+#expand_heading a{color:#000;text-decoration:none;}
+.expand-expanded .expand-bracket:first-of-type {margin-left:-0.2em;margin-right:0.2em;color:#ccc;} 
+.expand-expanded .expand-bracket:not(:first-of-type) {margin-right:-0.2em;margin-left:0.2em;color:#ccc}
+ 
+
+
+

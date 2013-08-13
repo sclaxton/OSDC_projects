@@ -51,72 +51,13 @@ $j( document ).ready(function () {
 
     var expand_toggle = expand_span.append("a")
         .attr("class", "expander")
+        .attr("data-expander-target", ".closed")
         .text("+")
     
-   
     var expand_close_brack = expand_span.append("span")
         .attr("class", "expand-bracket") 
         .text("]")
-
-    var $closingBracket,$expandedOnly,$hiddenBracket,$outerClosingBracket,expandTimeout
-    var shrinkTimeout,$expand,$heading,$link,$link,$brackets
-    $expand=$j('#expand')
-    $heading=$j('#expand_heading')
-    $link=$expand.find('a').eq(0)
-    $link.attr("href","#expand")
-    $brackets=$j([$expand.get(0).firstChild,$expand.get(0).lastChild]);
-    function toggleAll() {
-        $link.text(function() {
-            var $expanders = $j(".expander.title") 
-            var $expanded = $expanders.filter(".expanded")
-            var $collapsed = $expanders.filter(".collapsed")
-            var toggle = ""
-            if ( $link.text() == "−" ) { 
-                $expanded.removeClass("expanded").addClass("collapsed")                
-                toggle = "+"
-            }
-            else {
-                $collapsed.removeClass("collapsed").addClass("expanded")
-                toggle = "−" 
-            }
-            $j(".expanders.title").each( function (i, el) { 
-                update_data(el) 
-            });     
-            return toggle   
-        });
-    }
-    function expandSoon() {
-        clearTimeout(shrinkTimeout);
-        expandTimeout=setTimeout(expand,100);
-    }
-    function expand() {
-        clearTimeout(shrinkTimeout);
-        $heading.addClass('expand-expanded');
-        $link.attr("style","opacity:0.6;");
-    }
-    function shrinkSoon() {
-        clearTimeout(expandTimeout);
-        shrinkTimeout=setTimeout(shrink,100);
-    }
-    function shrink(){
-        clearTimeout(expandTimeout);
-        if(!$link.is(':focus') || !$link.hasClass('hover')){
-            $heading.removeClass('expand-expanded');
-            $link.attr("style", "opacity:1")
-        }        
-    }
-    if(!$brackets.hasClass('expand-bracket')){
-        $brackets=$brackets.wrap($j('<span>').addClass('expand-bracket')).parent();
-    }
-    $closingBracket=$brackets.last();
-    $heading.on({'mouseenter':expandSoon,'mouseleave':shrinkSoon});
-    $link.mouseenter(function(){
-        $j(this).addClass('hover');
-    }).mouseleave(function(){
-        $j(this).removeClass('hover');
-    });
-    $link.on({'focus':expand, 'blur':shrinkSoon,'click':toggleAll});
-    
+ 
     var list = chart.append("ul")
         .attr("class", "list") 
 
@@ -186,7 +127,69 @@ $j( document ).ready(function () {
         .attr("class", "content closed")
 
     $j(".expander").simpleexpand();
-     
+    
+    var $closingBracket,$expandedOnly,$hiddenBracket,$outerClosingBracket,expandTimeout
+    var shrinkTimeout,$expand,$heading,$link,$link,$brackets
+    $expand=$j('#expand')
+    $heading=$j('#expand_heading')
+    $link=$expand.find('a').eq(0)
+    $link.attr("href","#expand")
+    $brackets=$j([$expand.get(0).firstChild,$expand.get(0).lastChild]);
+    function toggleAll() {
+        $link.text(function() {
+            var $expanders = $j(".expander.title") 
+            var $expanded = $expanders.filter(".expanded")
+            var $collapsed = $expanders.filter(".collapsed")
+            var toggle = ""
+            if ($collapsed.length)  {
+                $link.attr("data-expander-target", "")
+                $collapsed.removeClass("collapsed").addClass("expanded")
+                toggle = "−" 
+            }
+            else {
+                $link.attr("data-expander-target", ".closed") 
+                $expanded.removeClass("expanded").addClass("collapsed")        
+                toggle = "+"
+            }
+            
+            $j(".expander.title").each( function (i, el) { 
+                setTimeout( function () { update_data(el) }, 200) 
+            });     
+            return toggle   
+        });
+    }
+    function expandSoon() {
+        clearTimeout(shrinkTimeout);
+        expandTimeout=setTimeout(expand,100);
+    }
+    function expand() {
+        clearTimeout(shrinkTimeout);
+        $heading.addClass('expand-expanded');
+        $link.attr("style","opacity:0.6;");
+    }
+    function shrinkSoon() {
+        clearTimeout(expandTimeout);
+        shrinkTimeout=setTimeout(shrink,100);
+    }
+    function shrink(){
+        clearTimeout(expandTimeout);
+        if(!$link.is(':focus') || !$link.hasClass('hover')){
+            $heading.removeClass('expand-expanded');
+            $link.attr("style", "opacity:1")
+        }        
+    }
+    if(!$brackets.hasClass('expand-bracket')){
+        $brackets=$brackets.wrap($j('<span>').addClass('expand-bracket')).parent();
+    }
+    $closingBracket=$brackets.last();
+    $heading.on({'mouseenter':expandSoon,'mouseleave':shrinkSoon});
+    $link.mouseenter(function(){
+        $j(this).addClass('hover');
+    }).mouseleave(function(){
+        $j(this).removeClass('hover');
+    });
+    $link.on({'focus':expand, 'blur':shrinkSoon,'click':toggleAll});
+
     ///////////////////////////////////////////////////////////////////////////////
     //// PIECHART CODE MODIFIED FROM D3 TUTORIAL //////////////////////////////////
     //// BY STEPHEN BOAK //////////////////////////////////////////////////////////
@@ -204,6 +207,8 @@ $j( document ).ready(function () {
     var pieData = [];    
     var oldPieData = [];
     var filteredPieData = [];
+    var arc_group
+    var label_group
    
     //D3 helper function to draw arcs, populates parameter "d" in path
     //object
@@ -279,8 +284,6 @@ $j( document ).ready(function () {
     
     function update_data (expander) {
         var $content = $j(expander).closest("div").next(".content")
-        var $li
-        console.log($content.is(":visible"))
         if ( $content.is(":visible") ) {
             $content.removeClass("closed") 
             var menu = $content.children(".h_list_container").contents().get(0)
@@ -300,27 +303,25 @@ $j( document ).ready(function () {
                 .text(String)
             
             menu_items.datum(function (d, i) { return data[menu_keys[i]] })
-            $li = $content.find(".h_list").contents()  // $j(that).is(".h_list li") ? $j(that).parent().contents() : $j(that).find(".h_list").contents()
-            $li.on("click", function (event) { update(event) })
+          
         }
 
         else { $content.addClass("closed")
-               $li.off("click") } 
+             } 
     }
     
-    
+    $j(".h_list").on("click", "li", function (event) { update(event) })
+
     $j(".expander.title").on("click", function (event) { 
         var that = event.target;
         setTimeout(function () { update_data(that) 
                                }, 200)
     })
 
-    var arc_group
-    var label_group
-
-    $j(".content").contents().addBack().on("mouseenter", function (event) {
+    
+    $j(".content").siblings().addBack().contents().addBack().on("mouseenter", function (event) {
         var that = event.target
-        var $vis = $j(that).hasClass("content") ? $j(that).find(".vis_container").contents() : $j(that).closest(".content").find(".vis_container").contents()
+        var $vis = $j(that).hasClass("content") || $j(that).hasClass("expander") ? $j(that).closest(".title_container").siblings().addBack().find(".vis_container").contents() : $j(that).closest(".content").find(".vis_container").contents()
         arc_group = d3.select($vis.find(".arc")[0])
         label_group = d3.select($vis.find(".label_group")[0]) 
     })
