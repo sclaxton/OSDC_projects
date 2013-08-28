@@ -141,10 +141,16 @@ def update_status():
                 else:
                     update_times[storage_name] = "None"
 
+    final_data = {} 
+
     for cloud in status_data:
-        status_data[cloud]["time"] = update_times[cloud]
-    
-    jsonString = json.dumps(status_data)
+        stats = status_data[cloud]
+        final_data[cloud]={} 
+        final_data[cloud]["time"] = update_times[cloud]
+        final_data[cloud]["stats"] = stats
+
+
+    jsonString = json.dumps(final_data)
 
     with open("json.txt", "w") as text_file:
         text_file.write(jsonString)
