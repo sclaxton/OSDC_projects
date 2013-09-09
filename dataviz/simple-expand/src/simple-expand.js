@@ -288,16 +288,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 }
 
                 that.setInitialState(expander, targets);
-
+                
                 // hook the click on the expander
                 expander.on("click", function () {
                     override_default_selector = expander.attr("data-expander-target")
-                    if (override_default_selector) {
-                        targetSelector = override_default_selector
-                    }
-                    else {
-                        targetSelector = that.settings.defaultTarget
-                    }
+                    targetSelector = override_default_selector || that.settings.defaultTarget
                     targets = that.findTargets(expander, searchMode, targetSelector)  
                     return that.toggle(expander, targets);
                 });
