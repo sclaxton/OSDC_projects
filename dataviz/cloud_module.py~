@@ -1,0 +1,21 @@
+class values:
+    def __init__(self,curr_val, max_val):
+        self.currVal = curr_val
+        self.maxVal = max_val
+
+class storageValues:
+    def __init__(self, curr_v):
+        values.__init__
+
+class Cloud:
+    def __init__(self, name):
+        self.name = name
+    
+        
+class StorageCloud(Cloud):
+    def __init__(self, name, storage_values):
+        Cloud.__init__(self, name)
+        self.storageValues = storage_values 
+        
+    
+    

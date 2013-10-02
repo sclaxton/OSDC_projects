@@ -28,11 +28,11 @@ Rickshaw.Graph.Legend = function(args) {
 			line.className += ' disabled';
 		}
 
-		var swatch = document.createElement('div');
-		swatch.className = 'swatch';
-		swatch.style.backgroundColor = series.color;
+		// var swatch = document.createElement('div');
+		// swatch.className = 'swatch';
+		// swatch.style.backgroundColor = series.color;
 
-		line.appendChild(swatch);
+		// line.appendChild(swatch);
 
 		var label = document.createElement('span');
 		label.className = 'label';
