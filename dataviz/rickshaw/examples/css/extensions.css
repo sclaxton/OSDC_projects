@@ -2,10 +2,14 @@ div, span, p, td {
 	font-family: Arial, sans-serif;
 }
 #content {
-	width: 1200px;
+	width: 1000px;        
+        background-color:black;
+        overflow:hidden;
+        padding: 20px 0 20px 0;
 }
 #chart {
 	display: inline-block;
+        background-color:white;
 }
 #chart path {
 	-webkit-transition: opacity 0.2s linear;
@@ -16,7 +20,8 @@ div, span, p, td {
 #legend {
 	display: inline-block;
 	position: relative;
-	left: 8px;
+        width: 100%; 
+        center: 0; 
 }
 #legend_container {
 	position: absolute;
@@ -27,6 +32,7 @@ div, span, p, td {
 #chart_container {
 	position: relative;
 	display: inline-block;
+        float:left; 
 }
 #smoother {
 	margin: 0 0 10px 16px;
@@ -39,14 +45,16 @@ div, span, p, td {
 	border: 1px solid #f0f0f0;
 }
 #side_panel {
-	padding: 0 20px 20px 0;
-	width: 240px;
+	padding: 0;
+	width: 25%;
 	display: inline-block;
 	vertical-align: top;
+        float:left;
 }
 #side_panel section {
-	color: #505050;
+	background-color: #000000;
 	font-size: 12px;
+        text-align:center;
 }
 #side_panel section h6 {
 	margin: 0 0 1em 0;
@@ -68,13 +76,13 @@ div, span, p, td {
 	cursor: pointer;
 }
 #legend {
-	background-color: white;
-	margin-left: 0;
+	background-color: black;
 	padding: 0;
-	left: 0;
 }
 #legend .label {
-	color: #404040;
+	color: white;
+        opacity: 0.75;
+        font-family:sans-serif
 }
 #legend .action {
 	color: black;
@@ -83,6 +91,11 @@ div, span, p, td {
 #legend ul {
 	padding: 0;
 }
+#legend ul .line {
+    text-align:left;
+    width:75%;
+    float:right; 
+}
 h1 {
 	font-family: Franklin Gothic Medium, UnDotum, Helvetica, Arial;
 	font-weight: normal;
@@ -90,8 +103,7 @@ h1 {
 }
 section {
 	border: none;
-	border-top: 1px solid #eaeaea;
-	padding: 15px 0;
+	padding: 10px;
 }
 #smoother {
 	margin: 5px 0 0 10px;
@@ -105,14 +117,14 @@ label.disabled {
 	margin: 0;
 }
 #renderer_form.toggler input[type=radio]:checked {
-	outline: 2px solid steelblue;
+	outline: 2px solid white;
 }
 #renderer_form.toggler input[type=radio] {
 	-moz-appearance: button;
-	background: white;
+	background: black;
 	margin: 0 7px;
 	width: 39px;
-	height: 26px;
+	height: 25px;
 	position: absolute;
 }
 #renderer_form.toggler label {
@@ -133,6 +145,7 @@ label.disabled {
 	vertical-align: top;
 	display: inline-block;
 	width: 45%;
+        text-align:left;
 }
 #interpolation_form label,
 #offset_form label {
@@ -182,3 +195,4 @@ label[for=linear] {
 label[for=step] {
 	background-image: url(../images/interp_step.png);
 }
+

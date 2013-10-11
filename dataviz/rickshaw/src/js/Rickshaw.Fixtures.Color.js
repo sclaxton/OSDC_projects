@@ -2,9 +2,22 @@ Rickshaw.namespace('Rickshaw.Fixtures.Color');
 
 Rickshaw.Fixtures.Color = function() {
 
-	this.schemes = {};
-
-	this.schemes.spectrum14 = [
+    this.schemes = {};
+    
+    this.schemes.osdc = [
+        '#d5f1ff',
+        '#a2e0ff',
+        '#6fcfff',
+        '#3cbdff',
+        '#09acff',
+        '#008dd5',
+        '#006ca2',
+        '#004a6f',
+        '#00283c',
+        '#00111a'
+    ]
+        
+        this.schemes.spectrum14 = [
 		'#ecb796',
 		'#dc8f70',
 		'#b2a470',
