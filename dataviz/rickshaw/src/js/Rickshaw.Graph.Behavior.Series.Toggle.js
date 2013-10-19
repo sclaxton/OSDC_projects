@@ -74,23 +74,23 @@ Rickshaw.Graph.Behavior.Series.Toggle = function(args) {
 
 	if (this.legend) {
 
-		if (typeof $ != 'undefined' && $(this.legend.list).sortable) {
+	// 	if (typeof $ != 'undefined' && $(this.legend.list).sortable) {
 
-			$(this.legend.list).sortable( {
-				start: function(event, ui) {
-					ui.item.bind('no.onclick',
-						function(event) {
-							event.preventDefault();
-						}
-					);
-				},
-				stop: function(event, ui) {
-					setTimeout(function(){
-						ui.item.unbind('no.onclick');
-					}, 250);
-				}
-			});
-		}
+	// 		$(this.legend.list).sortable( {
+	// 			start: function(event, ui) {
+	// 				ui.item.bind('no.onclick',
+	// 					function(event) {
+	// 						event.preventDefault();
+	// 					}
+	// 				);
+	// 			},
+	// 			stop: function(event, ui) {
+	// 				setTimeout(function(){
+	// 					ui.item.unbind('no.onclick');
+	// 				}, 250);
+	// 			}
+	// 		});
+	// 	}
 
 		this.legend.lines.forEach( function(l) {
 			self.addAnchor(l);

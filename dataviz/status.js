@@ -1,150 +1,150 @@
 var $j = jQuery.noConflict()
 $j( document ).ready(function () {                                               
-    console.log( "document loaded" )
-    var JSON
-    var JSON_vals  
-    var obj_arr = [];
-    (function() {
-        var callback = function () {
-            JSON = (function () {
-                var json = null
-                $j.ajax({
-                    'async': false,
-                    'global': false,
-                    'url': 'json.txt',
-                    'dataType': 'json',
-                  //  'mimeType': 'application/json',
-                    'success': function (data) { 
-                        json = data
-                    }
-                })
-                return json
-            })()
-        }
-        callback()
-        setInterval(callback, 30000) 
-    })()
-
-    ////////////////////////////////////////////////////////// 
-    // GLOBAL VARIABLES AND OBJECTS //////////////////////////
-    //////////////////////////////////////////////////////////
-    
-    var keys = Object.keys(JSON) 
-    var times = []
-    // piechart dimensions and properties
-    var w = 260;
-    var h = 260;
-    var r = 120;
-    var ir = 0;
-    var textOffset = 18;
-    var tweenDuration = 250;
-    var valueLabels
-    var pieData = [];    
-    var oldPieData = [];
-    var filteredPieData = [];
-    var arc_group
-    var label_group
-    var stat_list
-    var time_height
-    var title_height
-   
-
-    $j.each(JSON, function (k, v) {
-        times.push(v["time"])
-    }); 
-
-    ///////////////////////////////////////////////////////////
-    // FUNCTIONS //////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////
-    //// TWEEN FUNCTIONS TAKEN FROM D3 TUTORIAL BY ////////////
-    //// STEPHEN BOAK  ////////////////////////////////////////
-    ///////////////////////////////////////////////////////////
-
-    
-    // interpolate the arcs in data space.
-    var pieTween = function (d, i) {
-        var s0;
-        var e0;
-        if(oldPieData[i]){
-            s0 = oldPieData[i].startAngle;
-            e0 = oldPieData[i].endAngle;
-        } else if (!(oldPieData[i]) && oldPieData[i-1]) {
-            s0 = oldPieData[i-1].endAngle;
-            e0 = oldPieData[i-1].endAngle;
-        } else if(!(oldPieData[i-1]) && oldPieData.length > 0){
-            s0 = oldPieData[oldPieData.length-1].endAngle;
-            e0 = oldPieData[oldPieData.length-1].endAngle;
-        } else {
-            s0 = 0;
-            e0 = 0;
-        }
-        var i = d3.interpolate({startAngle: s0, endAngle: e0}, {startAngle: d.startAngle, endAngle: d.endAngle});
-        return function(t) {
-            var b = i(t);
-            return arc(b);
-        };
+console.log( "document loaded" )
+var JSON
+var JSON_vals  
+var obj_arr = [];
+(function() {
+    var callback = function () {
+        JSON = (function () {
+            var json = null
+            $j.ajax({
+                'async': false,
+                'global': false,
+                'url': 'json.txt',
+                'dataType': 'json',
+              //  'mimeType': 'application/json',
+                'success': function (data) { 
+                    json = data
+                }
+            })
+            return json
+        })()
     }
+    callback()
+    setInterval(callback, 30000) 
+})()
 
-    var removePieTween = function (d, i) {
-        s0 = 2 * Math.PI;
-        e0 = 2 * Math.PI;
-        var i = d3.interpolate({startAngle: d.startAngle, endAngle: d.endAngle}, {startAngle: s0, endAngle: e0});
-        return function(t) {
-            var b = i(t);
-            return arc(b);
-        };
+////////////////////////////////////////////////////////// 
+// GLOBAL VARIABLES AND OBJECTS //////////////////////////
+//////////////////////////////////////////////////////////
+
+var keys = Object.keys(JSON) 
+var times = []
+// piechart dimensions and properties
+var w = 260;
+var h = 260;
+var r = 120;
+var ir = 0;
+var textOffset = 18;
+var tweenDuration = 250;
+var valueLabels
+var pieData = [];    
+var oldPieData = [];
+var filteredPieData = [];
+var arc_group
+var label_group
+var stat_list
+var time_height
+var title_height
+
+
+$j.each(JSON, function (k, v) {
+    times.push(v["time"])
+}); 
+
+///////////////////////////////////////////////////////////
+// FUNCTIONS //////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+//// TWEEN FUNCTIONS TAKEN FROM D3 TUTORIAL BY ////////////
+//// STEPHEN BOAK  ////////////////////////////////////////
+///////////////////////////////////////////////////////////
+
+
+// interpolate the arcs in data space.
+var pieTween = function (d, i) {
+    var s0;
+    var e0;
+    if(oldPieData[i]){
+        s0 = oldPieData[i].startAngle;
+        e0 = oldPieData[i].endAngle;
+    } else if (!(oldPieData[i]) && oldPieData[i-1]) {
+        s0 = oldPieData[i-1].endAngle;
+        e0 = oldPieData[i-1].endAngle;
+    } else if(!(oldPieData[i-1]) && oldPieData.length > 0){
+        s0 = oldPieData[oldPieData.length-1].endAngle;
+        e0 = oldPieData[oldPieData.length-1].endAngle;
+    } else {
+        s0 = 0;
+        e0 = 0;
     }
+    var i = d3.interpolate({startAngle: s0, endAngle: e0}, {startAngle: d.startAngle, endAngle: d.endAngle});
+    return function(t) {
+        var b = i(t);
+        return arc(b);
+    };
+}
 
-    var textTween = function (d, i) {
-        var a;
-        if(oldPieData[i]){
-            a = (oldPieData[i].startAngle + oldPieData[i].endAngle -
-                 Math.PI)/2;
-        } else if (!(oldPieData[i]) && oldPieData[i-1]) {
-            a = (oldPieData[i-1].startAngle + oldPieData[i-1].endAngle -
-                 Math.PI)/2;
-        } else if(!(oldPieData[i-1]) && oldPieData.length > 0) {
-            a = (oldPieData[oldPieData.length-1].startAngle +
-                 oldPieData[oldPieData.length-1].endAngle - Math.PI)/2;
-        } else {
-            a = 0;
-        }
-        var b = (d.startAngle + d.endAngle - Math.PI)/2;
+var removePieTween = function (d, i) {
+    s0 = 2 * Math.PI;
+    e0 = 2 * Math.PI;
+    var i = d3.interpolate({startAngle: d.startAngle, endAngle: d.endAngle}, {startAngle: s0, endAngle: e0});
+    return function(t) {
+        var b = i(t);
+        return arc(b);
+    };
+}
 
-        var fn = d3.interpolateNumber(a, b);
-        return function(t) {
-            var val = fn(t);
-            return "translate(" + Math.cos(val) * (r+textOffset) + "," +
-                Math.sin(val) * (r+textOffset) + ")";
-        };
+var textTween = function (d, i) {
+    var a;
+    if(oldPieData[i]){
+        a = (oldPieData[i].startAngle + oldPieData[i].endAngle -
+             Math.PI)/2;
+    } else if (!(oldPieData[i]) && oldPieData[i-1]) {
+        a = (oldPieData[i-1].startAngle + oldPieData[i-1].endAngle -
+             Math.PI)/2;
+    } else if(!(oldPieData[i-1]) && oldPieData.length > 0) {
+        a = (oldPieData[oldPieData.length-1].startAngle +
+             oldPieData[oldPieData.length-1].endAngle - Math.PI)/2;
+    } else {
+        a = 0;
     }
+    var b = (d.startAngle + d.endAngle - Math.PI)/2;
 
-    // shuffles array at random using fisher-yates  
-    var shuffle_array = function  (array) {
-        var currentIndex = array.length
-        var temporaryValue, randomIndex;
-        // While there remain elements to shuffle...
-        while (0 !== currentIndex) {
-            // Pick a remaining element...
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-            // And swap it with the current element.
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
-        }
-        return array;
+    var fn = d3.interpolateNumber(a, b);
+    return function(t) {
+        var val = fn(t);
+        return "translate(" + Math.cos(val) * (r+textOffset) + "," +
+            Math.sin(val) * (r+textOffset) + ")";
+    };
+}
+
+// shuffles array at random using fisher-yates  
+var shuffle_array = function  (array) {
+    var currentIndex = array.length
+    var temporaryValue, randomIndex;
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
     }
-    
+    return array;
+}
 
-    var cumulativeOffset = function(element) {
-        var top = 0 
-        do {
-            top += element.offsetTop  || 0;
-            element = element.offsetParent;
-        } while(element);
-        
-        return top
+
+var cumulativeOffset = function(element) {
+    var top = 0 
+    do {
+        top += element.offsetTop  || 0;
+        element = element.offsetParent;
+    } while(element);
+
+    return top
     };
     
     var filterData = function (element, index, array) {

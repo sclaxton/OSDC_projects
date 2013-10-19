@@ -1,0 +1,11 @@
+import unittest
+from values import Values 
+
+class TestValues(unittest.TestCase):
+    def testValuesHasValues(self): 
+        values = Values(0, 0, None, None)
+        assert isinstance(values.currVal, (int, long, float, complex)), "no currVal!"
+        assert isinstance(values.currVal, (int, long, float, complex)), "no maxVal!"
+
+if __name__=="__main__":
+    unittest.main()
